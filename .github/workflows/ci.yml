@@ -1,0 +1,15 @@
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hamuyuuki/merging-hours-restriction@using-github-statuses-way
+        with:
+          appId: 1
+          privateKey: 1
+          installationId: 1
+          startHour: 9
+          endHour: 18
+        env:
+          TZ: Asia/Tokyo
