@@ -43,7 +43,9 @@ exports.getInputs = getInputs;
 function getContext() {
     return {
         repository_owner: github.context.repo.owner,
-        repository_name: github.context.repo.repo
+        repository_name: github.context.repo.repo,
+        workflow_name: github.context.workflow,
+        job_name: github.context.action
     };
 }
 exports.getContext = getContext;
@@ -86,6 +88,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(2186));
+const rest_1 = __webpack_require__(5375);
 const actions_toolkit_1 = __webpack_require__(8173);
 const merging_hours_restriction_1 = __webpack_require__(1956);
 function run() {
@@ -93,6 +96,17 @@ function run() {
         const inputs = actions_toolkit_1.getInputs();
         const context = actions_toolkit_1.getContext();
         merging_hours_restriction_1.currentPushableHours(inputs.startHour, inputs.endHour);
+        const octokit = new rest_1.Octokit({
+            auth: inputs.privateKey
+        });
+        octokit.repos.createCommitStatus({
+            owner: context.repository_owner,
+            repo: context.repository_name,
+            sha: 'eef6b04cfd73df8a36d65d75a23221f70c7fe29b',
+            state: 'success',
+            description: 'You can merge now!',
+            context: `${context.workflow_name} / ${context.job_name} (push)`
+        });
         core.info('You can merge now!');
         core.setFailed("You can't merge now!");
         core.info('You can merge now!');
@@ -2838,6 +2852,44 @@ exports.paginateRest = paginateRest;
 
 /***/ }),
 
+/***/ 8883:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+const VERSION = "1.0.3";
+
+/**
+ * @param octokit Octokit instance
+ * @param options Options passed to Octokit constructor
+ */
+
+function requestLog(octokit) {
+  octokit.hook.wrap("request", (request, options) => {
+    octokit.log.debug("request", options);
+    const start = Date.now();
+    const requestOptions = octokit.request.endpoint.parse(options);
+    const path = requestOptions.url.replace(options.baseUrl, "");
+    return request(options).then(response => {
+      octokit.log.info(`${requestOptions.method} ${path} - ${response.status} in ${Date.now() - start}ms`);
+      return response;
+    }).catch(error => {
+      octokit.log.info(`${requestOptions.method} ${path} - ${error.status} in ${Date.now() - start}ms`);
+      throw error;
+    });
+  });
+}
+requestLog.VERSION = VERSION;
+
+exports.requestLog = requestLog;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
 /***/ 3044:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -4265,6 +4317,31 @@ function isPlainObject(o) {
 }
 
 exports.isPlainObject = isPlainObject;
+
+
+/***/ }),
+
+/***/ 5375:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+var core = __webpack_require__(6762);
+var pluginRequestLog = __webpack_require__(8883);
+var pluginPaginateRest = __webpack_require__(4193);
+var pluginRestEndpointMethods = __webpack_require__(3044);
+
+const VERSION = "18.2.0";
+
+const Octokit = core.Octokit.plugin(pluginRequestLog.requestLog, pluginRestEndpointMethods.restEndpointMethods, pluginPaginateRest.paginateRest).defaults({
+  userAgent: `octokit-rest.js/${VERSION}`
+});
+
+exports.Octokit = Octokit;
+//# sourceMappingURL=index.js.map
 
 
 /***/ }),

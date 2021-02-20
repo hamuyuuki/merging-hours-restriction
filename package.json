@@ -28,7 +28,8 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@octokit/auth-app": "^2.10.3",
-    "@octokit/graphql": "^4.5.8"
+    "@octokit/graphql": "^4.5.8",
+    "@octokit/rest": "^18.2.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
