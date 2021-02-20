@@ -94,6 +94,7 @@ function run() {
         const context = actions_toolkit_1.getContext();
         merging_hours_restriction_1.currentPushableHours(inputs.startHour, inputs.endHour);
         core.info('You can merge now!');
+        core.setFailed("You can't merge now!");
     });
 }
 run();

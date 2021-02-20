@@ -12,6 +12,7 @@ async function run(): Promise<void> {
   currentPushableHours(inputs.startHour, inputs.endHour)
 
   core.info('You can merge now!')
+  core.setFailed("You can't merge now!")
 }
 
 run()
