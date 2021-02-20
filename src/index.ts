@@ -19,15 +19,11 @@ async function run(): Promise<void> {
   octokit.repos.createCommitStatus({
     owner: context.repository_owner,
     repo: context.repository_name,
-    sha: 'eef6b04cfd73df8a36d65d75a23221f70c7fe29b',
+    sha: context.sha,
     state: 'success',
     description: 'You can merge now!',
-    context: `${context.workflow_name} / ${context.job_name} (push)`
+    context: 'Merging Hours Restriction'
   })
-
-  core.info('You can merge now!')
-  core.setFailed("You can't merge now!")
-  core.info('You can merge now!')
 }
 
 run()

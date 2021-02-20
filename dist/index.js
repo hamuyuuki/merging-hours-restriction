@@ -45,7 +45,8 @@ function getContext() {
         repository_owner: github.context.repo.owner,
         repository_name: github.context.repo.repo,
         workflow_name: github.context.workflow,
-        job_name: github.context.job
+        job_name: github.context.job,
+        sha: github.context.sha
     };
 }
 exports.getContext = getContext;
@@ -58,25 +59,6 @@ exports.getContext = getContext;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -87,7 +69,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__webpack_require__(2186));
 const rest_1 = __webpack_require__(5375);
 const actions_toolkit_1 = __webpack_require__(8173);
 const merging_hours_restriction_1 = __webpack_require__(1956);
@@ -102,14 +83,11 @@ function run() {
         octokit.repos.createCommitStatus({
             owner: context.repository_owner,
             repo: context.repository_name,
-            sha: 'eef6b04cfd73df8a36d65d75a23221f70c7fe29b',
+            sha: context.sha,
             state: 'success',
             description: 'You can merge now!',
-            context: `${context.workflow_name} / ${context.job_name} (push)`
+            context: 'Merging Hours Restriction'
         });
-        core.info('You can merge now!');
-        core.setFailed("You can't merge now!");
-        core.info('You can merge now!');
     });
 }
 run();
