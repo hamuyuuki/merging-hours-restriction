@@ -69,6 +69,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const graphql_1 = __webpack_require__(8467);
 const rest_1 = __webpack_require__(5375);
 const actions_toolkit_1 = __webpack_require__(8173);
 const merging_hours_restriction_1 = __webpack_require__(1956);
@@ -80,14 +81,27 @@ function run() {
         const octokit = new rest_1.Octokit({
             auth: inputs.privateKey
         });
-        octokit.repos.createCommitStatus({
-            owner: context.repository_owner,
-            repo: context.repository_name,
-            sha: '56b418eacc7329ca8b8f45e8583be5fa58a54cdd',
-            state: 'failure',
-            description: 'You can merge now!',
-            context: 'Merging Hours Restriction'
+        const graphqlWithAuth = graphql_1.graphql.defaults({
+            headers: {
+                authorization: `token ${inputs.privateKey}`
+            }
         });
+        yield graphqlWithAuth(`
+      mutation MyMutation {
+        __typename
+        rerequestCheckSuite(input: {repositoryId: "MDEwOlJlcG9zaXRvcnkzNDA1NTMyMjI=", checkSuiteId: "MDEwOkNoZWNrU3VpdGUyMDgyOTU0NTE1"}) {
+          clientMutationId
+        }
+      }
+    `);
+        // octokit.repos.createCommitStatus({
+        //   owner: context.repository_owner,
+        //   repo: context.repository_name,
+        //   sha: '56b418eacc7329ca8b8f45e8583be5fa58a54cdd',
+        //   state: 'failure',
+        //   description: 'You can merge now!',
+        //   context: 'Merging Hours Restriction'
+        // })
     });
 }
 run();
