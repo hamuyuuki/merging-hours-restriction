@@ -27,6 +27,6 @@ export function getContext(): {
     repository_owner: github.context.repo.owner,
     repository_name: github.context.repo.repo,
     workflow_name: github.context.workflow,
-    job_name: github.context.action
+    job_name: github.context.job
   }
 }
