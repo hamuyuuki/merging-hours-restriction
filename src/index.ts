@@ -13,6 +13,7 @@ async function run(): Promise<void> {
 
   core.info('You can merge now!')
   core.setFailed("You can't merge now!")
+  core.info('You can merge now!')
 }
 
 run()
