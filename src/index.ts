@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import {getInputs, getContext} from './actions-toolkit'
 import {
   currentPushableHours,
@@ -9,6 +10,8 @@ async function run(): Promise<void> {
   const context = getContext()
 
   currentPushableHours(inputs.startHour, inputs.endHour)
+
+  core.info('You can merge now!')
 }
 
 run()
