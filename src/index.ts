@@ -13,26 +13,8 @@ async function run(): Promise<void> {
 
   currentPushableHours(inputs.startHour, inputs.endHour)
 
-  const octokit = new Octokit({
-    auth: inputs.privateKey
-  })
-
-  const graphqlWithAuth = graphql.defaults({
-    headers: {
-      authorization: `token ${inputs.privateKey}`
-    }
-  })
-
-  await graphqlWithAuth(
-    `
-      mutation MyMutation {
-        __typename
-        rerequestCheckSuite(input: {repositoryId: "MDEwOlJlcG9zaXRvcnkzNDA1NTMyMjI=", checkSuiteId: "MDEwOkNoZWNrU3VpdGUyMDgyOTU0NTE1"}) {
-          clientMutationId
-        }
-      }
-    `
-  )
+  core.info(new Date().toString())
+  core.info('You can merge now!')
 
   // octokit.repos.createCommitStatus({
   //   owner: context.repository_owner,
