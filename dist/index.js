@@ -98,14 +98,6 @@ function run() {
         merging_hours_restriction_1.currentPushableHours(inputs.startHour, inputs.endHour);
         core.info(new Date().toString());
         core.info('You can merge now!');
-        // octokit.repos.createCommitStatus({
-        //   owner: context.repository_owner,
-        //   repo: context.repository_name,
-        //   sha: '56b418eacc7329ca8b8f45e8583be5fa58a54cdd',
-        //   state: 'failure',
-        //   description: 'You can merge now!',
-        //   context: 'Merging Hours Restriction'
-        // })
     });
 }
 run();
