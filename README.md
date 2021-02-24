@@ -15,7 +15,7 @@ jobs:
   merging_hours_restriction:
     runs-on: ubuntu-latest
     steps:
-      - uses: hamuyuuki/merging-hours-restriction@v0.1.0
+      - uses: hamuyuuki/merging-hours-restriction@v0.0.1
         with:
           appId: ${{ secrets.PUSHING_HOURS_RESTRICTION_APP_ID }}
           privateKey: ${{ secrets.PUSHING_HOURS_RESTRICTION_PRIVATE_KEY }}

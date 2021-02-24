@@ -4,10 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: hamuyuuki/merging-hours-restriction@using-github-statuses-way
+      - uses: hamuyuuki/merging-hours-restriction@main
         with:
           appId: 1
-          privateKey: 1
+          privateKey: ${{ secrets.GITHUB_TOKEN }}
           installationId: 1
           startHour: 9
           endHour: 18

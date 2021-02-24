@@ -43,7 +43,8 @@ exports.getInputs = getInputs;
 function getContext() {
     return {
         repository_owner: github.context.repo.owner,
-        repository_name: github.context.repo.repo
+        repository_name: github.context.repo.repo,
+        branch_name: github.context.ref
     };
 }
 exports.getContext = getContext;
@@ -56,6 +57,25 @@ exports.getContext = getContext;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -66,13 +86,70 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__webpack_require__(2186));
+const graphql_1 = __webpack_require__(8467);
 const actions_toolkit_1 = __webpack_require__(8173);
 const merging_hours_restriction_1 = __webpack_require__(1956);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const inputs = actions_toolkit_1.getInputs();
         const context = actions_toolkit_1.getContext();
-        merging_hours_restriction_1.currentPushableHours(inputs.startHour, inputs.endHour);
+        if (context.branch_name !== 'refs/heads/main') {
+            if (merging_hours_restriction_1.currentPushableHours(inputs.startHour, inputs.endHour)) {
+                return core.info('You can merge now!');
+            }
+            else {
+                return core.setFailed('You can not merge now!');
+            }
+        }
+        const graphqlWithAuth = graphql_1.graphql.defaults({
+            headers: {
+                authorization: `token ${inputs.privateKey}`
+            }
+        });
+        const searchQuery = `
+    {
+      search(query: "is:pr is:open repo:hamuyuuki/merging-hours-restriction updated:>=2021-02-22 draft:false", type: ISSUE, first: 100) {
+        nodes {
+          ... on PullRequest {
+            commits(last: 1) {
+              nodes {
+                commit {
+                  checkSuites(first: 10) {
+                    nodes {
+                      id
+                      checkRuns(filterBy: {checkName: "build"}, first: 1) {
+                        nodes {
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+        const repositoryQuery = `
+    {
+      repository(owner: "hamuyuuki", name: "merging-hours-restriction") {
+        id
+      }
+    }
+  `;
+        const { search } = yield graphqlWithAuth(searchQuery);
+        const { repository } = yield graphqlWithAuth(repositoryQuery);
+        yield graphqlWithAuth(`
+      mutation MyMutation {
+        __typename
+        rerequestCheckSuite(input: {repositoryId: "${repository.id}", checkSuiteId: "${search.nodes[0].commits.nodes[0].commit.checkSuites.nodes[1].id}"}) {
+          clientMutationId
+        }
+      }
+    `);
     });
 }
 run();
