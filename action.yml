@@ -1,0 +1,22 @@
+name: 'Merging Hours Restriction'
+description: 'Add merging hours restriction to the Branch protection rule of the default branch'
+author: 'hamuyuuki'
+inputs:
+  appId:
+    required: true
+    description: ''
+  privateKey:
+    required: true
+    description: ''
+  installationId:
+    required: true
+    description: ''
+  startHour:
+    required: true
+    description: ''
+  endHour:
+    required: true
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
